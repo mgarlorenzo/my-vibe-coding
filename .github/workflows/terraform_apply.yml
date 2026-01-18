@@ -118,7 +118,10 @@ jobs:
             -var="project_id=${{ vars.GCP_PROJECT_ID }}" \
             -var="region=${{ vars.GCP_REGION }}" \
             -var="env=${{ github.event.inputs.environment || 'dev' }}" \
-            -var="app_name=employee-platform" \
+            -var="app_name=${{ vars.APP_NAME }}" \
+            -var="db_instance_name=${{ vars.DB_INSTANCE_NAME }}" \
+            -var="db_name=${{ vars.DB_NAME }}" \
+            -var="db_user=${{ vars.DB_USER }}" \
             -out=tfplan \
             -no-color
         working-directory: ${{ env.TF_WORKING_DIR }}
