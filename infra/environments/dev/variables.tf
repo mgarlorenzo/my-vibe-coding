@@ -57,10 +57,10 @@ locals {
   # Common labels for all resources
   common_labels = merge(
     {
-      env         = var.env
-      app         = var.app_name
-      managed_by  = "terraform"
-      repository  = "my-vibe-coding"
+      env        = var.env
+      app        = var.app_name
+      managed_by = "terraform"
+      repository = "my-vibe-coding"
     },
     var.labels
   )
