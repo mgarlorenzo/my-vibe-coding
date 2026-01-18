@@ -1,0 +1,3 @@
+# Require review for infrastructure changes
+/infra/ @mgarlorenzo
+/.github/workflows/ @mgarlorenzo

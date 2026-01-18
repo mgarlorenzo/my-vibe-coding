@@ -1,0 +1,34 @@
+# Gitleaks configuration
+# https://github.com/gitleaks/gitleaks
+
+title = "Gitleaks Config"
+
+[extend]
+useDefault = true
+
+# Allow specific patterns that are not secrets
+[[rules]]
+id = "allowed-placeholder"
+description = "Allowed placeholder values"
+regex = '''(?i)(example|placeholder|your-.*-here|xxx|changeme)'''
+allowlist = true
+
+# Paths to ignore
+[allowlist]
+paths = [
+  '''node_modules''',
+  '''\.git''',
+  '''vendor''',
+  '''\.terraform''',
+  '''dist''',
+  '''build''',
+  '''target''',
+]
+
+# Files to ignore
+files = [
+  '''go\.sum''',
+  '''package-lock\.json''',
+  '''pnpm-lock\.yaml''',
+  '''\.lock''',
+]

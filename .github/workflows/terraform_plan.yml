@@ -18,6 +18,8 @@ on:
     paths:
       - 'infra/**'
       - '.github/workflows/terraform_plan.yml'
+    # Security: Don't run on forks to prevent credential theft
+    types: [opened, synchronize, reopened]
 
 permissions:
   contents: read
@@ -32,6 +34,8 @@ jobs:
   terraform-plan:
     name: Terraform Plan
     runs-on: ubuntu-latest
+    # Security: Skip workflow for PRs from forks (prevents credential theft)
+    if: github.event.pull_request.head.repo.full_name == github.repository
     
     steps:
       # -----------------------------------------------------------------
