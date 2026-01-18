@@ -114,13 +114,28 @@ jobs:
       - name: Terraform Plan
         if: github.event_name == 'workflow_dispatch' || steps.download-plan.outcome != 'success'
         run: |
-          terraform plan \
-            -var="project_id=${{ vars.GCP_PROJECT_ID }}" \
-            -var="region=${{ vars.GCP_REGION }}" \
-            -var="env=${{ github.event.inputs.environment || 'dev' }}" \
-            -var="app_name=employee-platform" \
-            -out=tfplan \
-            -no-color
+          # Build terraform plan command with optional variables
+          TF_ARGS="-var=project_id=${{ vars.GCP_PROJECT_ID }}"
+          TF_ARGS="$TF_ARGS -var=region=${{ vars.GCP_REGION || 'europe-west3' }}"
+          TF_ARGS="$TF_ARGS -var=env=${{ github.event.inputs.environment || 'dev' }}"
+          
+          # Only pass app_name if configured (otherwise use Terraform default)
+          if [ -n "${{ vars.APP_NAME }}" ]; then
+            TF_ARGS="$TF_ARGS -var=app_name=${{ vars.APP_NAME }}"
+          fi
+          
+          # Only pass DB variables if configured (otherwise Terraform derives from app_name)
+          if [ -n "${{ vars.DB_INSTANCE_NAME }}" ]; then
+            TF_ARGS="$TF_ARGS -var=db_instance_name=${{ vars.DB_INSTANCE_NAME }}"
+          fi
+          if [ -n "${{ vars.DB_NAME }}" ]; then
+            TF_ARGS="$TF_ARGS -var=db_name=${{ vars.DB_NAME }}"
+          fi
+          if [ -n "${{ vars.DB_USER }}" ]; then
+            TF_ARGS="$TF_ARGS -var=db_user=${{ vars.DB_USER }}"
+          fi
+          
+          terraform plan $TF_ARGS -out=tfplan -no-color
         working-directory: ${{ env.TF_WORKING_DIR }}
 
       # -----------------------------------------------------------------

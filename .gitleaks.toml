@@ -6,13 +6,6 @@ title = "Gitleaks Config"
 [extend]
 useDefault = true
 
-# Allow specific patterns that are not secrets
-[[rules]]
-id = "allowed-placeholder"
-description = "Allowed placeholder values"
-regex = '''(?i)(example|placeholder|your-.*-here|xxx|changeme)'''
-allowlist = true
-
 # Paths to ignore
 [allowlist]
 paths = [
@@ -31,4 +24,9 @@ files = [
   '''package-lock\.json''',
   '''pnpm-lock\.yaml''',
   '''\.lock''',
+]
+
+# Regex patterns to allow (not secrets)
+regexes = [
+  '''(?i)(example|placeholder|your-.*-here|xxx|changeme)''',
 ]

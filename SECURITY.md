@@ -46,6 +46,20 @@ All secrets are stored in GitHub Secrets, never in code:
 - `GCP_WIF_PROVIDER` - Workload Identity Federation provider
 - `GCP_SA_EMAIL` - Service Account email
 
+#### 5. Variables (Settings → Secrets and variables → Actions → Variables)
+
+Non-sensitive configuration stored in GitHub Variables:
+
+| Variable | Description | Example |
+|----------|-------------|---------|
+| `GCP_PROJECT_ID` | GCP project ID | `my-project-123` |
+| `GCP_REGION` | GCP region | `europe-west3` |
+| `TF_STATE_BUCKET` | GCS bucket for Terraform state | `my-project-tfstate` |
+| `APP_NAME` | Application name | `employee-platform` |
+| `DB_INSTANCE_NAME` | Cloud SQL instance name | `employee-platform-db` |
+| `DB_NAME` | Database name | `employee-platform` |
+| `DB_USER` | Database user | `employee_platform_app` |
+
 ### What's Safe to Be Public
 
 | Item | Why It's OK |
