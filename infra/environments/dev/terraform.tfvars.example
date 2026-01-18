@@ -1,0 +1,15 @@
+# Example terraform.tfvars for dev environment
+# Copy this file to terraform.tfvars and fill in your values
+# 
+# NOTE: In CI/CD, these values come from GitHub secrets/variables
+#       Do NOT commit terraform.tfvars with real values
+
+project_id = "your-gcp-project-id"
+region     = "europe-west1"
+env        = "dev"
+app_name   = "employee-platform"
+
+labels = {
+  team  = "platform"
+  owner = "your-email"
+}

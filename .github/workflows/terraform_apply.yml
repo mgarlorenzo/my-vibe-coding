@@ -1,0 +1,153 @@
+# -----------------------------------------------------------------------------
+# Terraform Apply Workflow
+# -----------------------------------------------------------------------------
+# Runs on:
+# - Push to main (when infra/** changes)
+# - Manual workflow dispatch
+#
+# Downloads plan artifact and applies (or creates new plan if manual)
+# -----------------------------------------------------------------------------
+
+name: Terraform Apply
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'infra/**'
+      - '.github/workflows/terraform_apply.yml'
+  
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Environment to deploy'
+        required: true
+        default: 'dev'
+        type: choice
+        options:
+          - dev
+          - staging
+          - prod
+      auto_approve:
+        description: 'Auto-approve apply (skip confirmation)'
+        required: false
+        default: false
+        type: boolean
+
+permissions:
+  contents: read
+  id-token: write  # Required for OIDC authentication
+
+env:
+  TF_VERSION: '1.5.7'
+  TF_WORKING_DIR: 'infra/environments/dev'
+
+jobs:
+  terraform-apply:
+    name: Terraform Apply
+    runs-on: ubuntu-latest
+    environment: ${{ github.event.inputs.environment || 'dev' }}
+    
+    steps:
+      # -----------------------------------------------------------------
+      # Checkout
+      # -----------------------------------------------------------------
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # -----------------------------------------------------------------
+      # Setup Terraform
+      # -----------------------------------------------------------------
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: ${{ env.TF_VERSION }}
+          terraform_wrapper: false
+
+      # -----------------------------------------------------------------
+      # Authenticate to Google Cloud via OIDC
+      # -----------------------------------------------------------------
+      - name: Authenticate to Google Cloud
+        id: auth
+        uses: google-github-actions/auth@v2
+        with:
+          workload_identity_provider: ${{ secrets.GCP_WIF_PROVIDER }}
+          service_account: ${{ secrets.GCP_SA_EMAIL }}
+
+      # -----------------------------------------------------------------
+      # Setup gcloud CLI
+      # -----------------------------------------------------------------
+      - name: Setup gcloud CLI
+        uses: google-github-actions/setup-gcloud@v2
+        with:
+          project_id: ${{ vars.GCP_PROJECT_ID }}
+
+      # -----------------------------------------------------------------
+      # Terraform Init
+      # -----------------------------------------------------------------
+      - name: Terraform Init
+        id: init
+        run: |
+          terraform init \
+            -backend-config="bucket=${{ vars.TF_STATE_BUCKET }}" \
+            -backend-config="prefix=infra/${{ github.event.inputs.environment || 'dev' }}"
+        working-directory: ${{ env.TF_WORKING_DIR }}
+
+      # -----------------------------------------------------------------
+      # Download Plan Artifact (if from push, not manual)
+      # -----------------------------------------------------------------
+      - name: Download Plan Artifact
+        if: github.event_name == 'push'
+        uses: dawidd6/action-download-artifact@v3
+        with:
+          workflow: terraform_plan.yml
+          name: tfplan-dev
+          path: ${{ env.TF_WORKING_DIR }}
+          search_artifacts: true
+        continue-on-error: true
+        id: download-plan
+
+      # -----------------------------------------------------------------
+      # Terraform Plan (if manual dispatch or no artifact)
+      # -----------------------------------------------------------------
+      - name: Terraform Plan
+        if: github.event_name == 'workflow_dispatch' || steps.download-plan.outcome != 'success'
+        run: |
+          terraform plan \
+            -var="project_id=${{ vars.GCP_PROJECT_ID }}" \
+            -var="region=${{ vars.GCP_REGION }}" \
+            -var="env=${{ github.event.inputs.environment || 'dev' }}" \
+            -var="app_name=employee-platform" \
+            -out=tfplan \
+            -no-color
+        working-directory: ${{ env.TF_WORKING_DIR }}
+
+      # -----------------------------------------------------------------
+      # Terraform Apply
+      # -----------------------------------------------------------------
+      - name: Terraform Apply
+        run: |
+          if [ -f tfplan ]; then
+            echo "Applying saved plan..."
+            terraform apply -auto-approve tfplan
+          else
+            echo "::error::No plan file found"
+            exit 1
+          fi
+        working-directory: ${{ env.TF_WORKING_DIR }}
+
+      # -----------------------------------------------------------------
+      # Output Summary
+      # -----------------------------------------------------------------
+      - name: Output Summary
+        run: |
+          echo "## Terraform Apply Summary" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "| Property | Value |" >> $GITHUB_STEP_SUMMARY
+          echo "|----------|-------|" >> $GITHUB_STEP_SUMMARY
+          echo "| Environment | ${{ github.event.inputs.environment || 'dev' }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Project | ${{ vars.GCP_PROJECT_ID }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Region | ${{ vars.GCP_REGION }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Triggered by | @${{ github.actor }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Commit | ${{ github.sha }} |" >> $GITHUB_STEP_SUMMARY
