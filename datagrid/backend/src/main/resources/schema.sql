@@ -1,0 +1,50 @@
+DROP TABLE IF EXISTS employees;
+
+CREATE TABLE employees (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    company_id BIGINT NOT NULL,
+    updated_at TIMESTAMP WITH TIME ZONE,
+    affiliation VARCHAR(255),
+    all_reportees_group_id BIGINT,
+    author_id BIGINT,
+    country VARCHAR(100),
+    creation_date TIMESTAMP WITH TIME ZONE,
+    date_of_birth TIMESTAMP WITH TIME ZONE,
+    email VARCHAR(255),
+    first_name VARCHAR(255),
+    gender VARCHAR(50),
+    last_name VARCHAR(255),
+    legal_entity_id BIGINT,
+    location_id BIGINT,
+    manager_id BIGINT,
+    start_date TIMESTAMP WITH TIME ZONE,
+    termination_date TIMESTAMP WITH TIME ZONE,
+    termination_reason VARCHAR(500),
+    termination_reason_type VARCHAR(100),
+    termination_request_date TIMESTAMP WITH TIME ZONE,
+    untermination_date TIMESTAMP WITH TIME ZONE,
+    address_line_1 VARCHAR(500),
+    address_line_2 VARCHAR(500),
+    bank_number VARCHAR(100),
+    city VARCHAR(255),
+    company_identifier VARCHAR(255),
+    created_by_id BIGINT,
+    created_by_type VARCHAR(100),
+    disability_percentage_cents INT,
+    employee_group_id BIGINT,
+    identifier VARCHAR(255),
+    irpf_cents INT,
+    is_resident BOOLEAN,
+    nationality VARCHAR(100),
+    phone_number VARCHAR(50),
+    postal_code VARCHAR(20),
+    social_security_number VARCHAR(100),
+    state VARCHAR(100),
+    swift_bic VARCHAR(50),
+    tax_id VARCHAR(100),
+    termination_observations VARCHAR(1000)
+);
+
+CREATE INDEX idx_employees_company_id ON employees(company_id);
+CREATE INDEX idx_employees_email ON employees(email);
+CREATE INDEX idx_employees_termination_date ON employees(termination_date);

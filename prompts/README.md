@@ -1,0 +1,1 @@
+# Prompts\n\nEsta carpeta contiene los prompts utilizados durante el desarrollo de este proyecto.\n\n## Estructura sugerida\n\n- `/features` - Prompts para implementar funcionalidades\n- `/fixes` - Prompts para resolver bugs\n- `/refactors` - Prompts para refactorizaciones\n\n## Cómo usar\n\nAñade tus prompts como archivos .md con fecha y descripción.

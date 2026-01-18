@@ -1,0 +1,176 @@
+scalar DateTime
+
+type Query {
+    employees(filter: EmployeeFilter, paging: EmployeePaging, sorting: EmployeeSorting): EmployeeConnection!
+    employee(id: ID!): Employee
+}
+
+type Mutation {
+    createEmployee(input: CreateEmployeeInput!): Employee!
+    updateEmployee(id: ID!, input: UpdateEmployeeInput!): Employee!
+    terminateEmployee(id: ID!, input: TerminateEmployeeInput): Employee!
+    unterminateEmployee(id: ID!, date: DateTime): Employee!
+}
+
+type Subscription {
+    employeeChanged: EmployeeEvent!
+}
+
+type Employee {
+    id: ID!
+    companyId: Int!
+    updatedAt: DateTime
+    affiliation: String
+    allReporteesGroupId: Int
+    authorId: Int
+    country: String
+    creationDate: DateTime
+    dateOfBirth: DateTime
+    email: String
+    firstName: String
+    gender: String
+    lastName: String
+    legalEntityId: Int
+    locationId: Int
+    managerId: Int
+    startDate: DateTime
+    terminationDate: DateTime
+    terminationReason: String
+    terminationReasonType: String
+    terminationRequestDate: DateTime
+    unterminationDate: DateTime
+    addressLine1: String
+    addressLine2: String
+    bankNumber: String
+    city: String
+    companyIdentifier: String
+    createdById: Int
+    createdByType: String
+    disabilityPercentageCents: Int
+    employeeGroupId: Int
+    identifier: String
+    irpfCents: Int
+    isResident: Boolean
+    nationality: String
+    phoneNumber: String
+    postalCode: String
+    socialSecurityNumber: String
+    state: String
+    swiftBic: String
+    taxId: String
+    terminationObservations: String
+}
+
+type EmployeeConnection {
+    items: [Employee!]!
+    totalCount: Int!
+    hasNextPage: Boolean!
+}
+
+type EmployeeEvent {
+    eventType: EventType!
+    employee: Employee!
+    timestamp: DateTime!
+}
+
+enum EventType {
+    CREATED
+    UPDATED
+    TERMINATED
+    UNTERMINATED
+}
+
+input EmployeeFilter {
+    searchTerm: String
+    companyId: Int
+    includeTerminated: Boolean
+}
+
+input EmployeePaging {
+    offset: Int
+    limit: Int
+}
+
+input EmployeeSorting {
+    field: String
+    direction: String
+}
+
+input CreateEmployeeInput {
+    companyId: Int!
+    affiliation: String
+    allReporteesGroupId: Int
+    authorId: Int
+    country: String
+    dateOfBirth: DateTime
+    email: String
+    firstName: String
+    gender: String
+    lastName: String
+    legalEntityId: Int
+    locationId: Int
+    managerId: Int
+    startDate: DateTime
+    addressLine1: String
+    addressLine2: String
+    bankNumber: String
+    city: String
+    companyIdentifier: String
+    createdById: Int
+    createdByType: String
+    disabilityPercentageCents: Int
+    employeeGroupId: Int
+    identifier: String
+    irpfCents: Int
+    isResident: Boolean
+    nationality: String
+    phoneNumber: String
+    postalCode: String
+    socialSecurityNumber: String
+    state: String
+    swiftBic: String
+    taxId: String
+}
+
+input UpdateEmployeeInput {
+    companyId: Int
+    affiliation: String
+    allReporteesGroupId: Int
+    authorId: Int
+    country: String
+    dateOfBirth: DateTime
+    email: String
+    firstName: String
+    gender: String
+    lastName: String
+    legalEntityId: Int
+    locationId: Int
+    managerId: Int
+    startDate: DateTime
+    addressLine1: String
+    addressLine2: String
+    bankNumber: String
+    city: String
+    companyIdentifier: String
+    createdById: Int
+    createdByType: String
+    disabilityPercentageCents: Int
+    employeeGroupId: Int
+    identifier: String
+    irpfCents: Int
+    isResident: Boolean
+    nationality: String
+    phoneNumber: String
+    postalCode: String
+    socialSecurityNumber: String
+    state: String
+    swiftBic: String
+    taxId: String
+}
+
+input TerminateEmployeeInput {
+    terminationDate: DateTime
+    terminationReason: String
+    terminationReasonType: String
+    terminationObservations: String
+}
