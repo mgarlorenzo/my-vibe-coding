@@ -18,22 +18,17 @@
 # -----------------------------------------------------------------------------
 
 # Enable required APIs
-# Uncomment as needed when adding resources
+resource "google_project_service" "apis" {
+  for_each = toset([
+    "cloudresourcemanager.googleapis.com",
+    "iam.googleapis.com",
+    "iamcredentials.googleapis.com",
+    "sts.googleapis.com",
+  ])
 
-# resource "google_project_service" "apis" {
-#   for_each = toset([
-#     "compute.googleapis.com",
-#     "container.googleapis.com",
-#     "run.googleapis.com",
-#     "cloudsql.googleapis.com",
-#     "secretmanager.googleapis.com",
-#     "cloudresourcemanager.googleapis.com",
-#     "iam.googleapis.com",
-#   ])
-#
-#   project = var.project_id
-#   service = each.value
-#
-#   disable_dependent_services = false
-#   disable_on_destroy         = false
-# }
+  project = var.project_id
+  service = each.value
+
+  disable_dependent_services = false
+  disable_on_destroy         = false
+}
